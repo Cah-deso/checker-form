@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Pendaftaran Checker</title>
+  <style>
+    body {
+      background-color: #2f2f2f;
+      color: white;
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      padding: 20px;
+    }
+    .container {
+      background-color: #444;
+      padding: 20px;
+      border-radius: 10px;
+      width: 100%;
+      max-width: 500px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.3);
+    }
+    input, button {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 5px;
+      border: none;
+    }
+    input {
+      background-color: #666;
+      color: white;
+    }
+    button {
+      background-color: #5cb85c;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #4cae4c;
+    }
+    label {
+      margin-top: 10px;
+      display: block;
+    }
+    #status {
+      margin-top: 10px;
+      text-align: center;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Pendaftaran Checker</h2>
+    <form id="checkerForm">
+      <label for="nama">Nama:</label>
+      <input type="text" id="nama" name="nama" required>
+
+      <label for="noktp">No. KTP:</label>
+      <input type="text" id="noktp" name="noktp" required>
+
+      <label for="tempatlahir">Tempat Lahir:</label>
+      <input type="text" id="tempatlahir" name="tempatlahir" required>
+
+      <label for="tgllahir">Tanggal Lahir:</label>
+      <input type="date" id="tgllahir" name="tgllahir" required>
+
+      <label for="password">Password (otomatis):</label>
+      <input type="text" id="password" name="password" readonly>
+
+      <button type="submit">Kirim</button>
+    </form>
+    <div id="status"></div>
+  </div>
+
+  <script>
+    function generatePassword(nama, tgllahir) {
+      const hurufPertama = nama.trim().charAt(0).toLowerCase();
+      const tgl = tgllahir.substring(8, 10);
+      const bln = tgllahir.substring(5, 7);
+      const thn = tgllahir.substring(2, 4);
+      return hurufPertama + tgl + bln + thn;
+    }
+
+    document.getElementById('nama').addEventListener('input', updatePassword);
+    document.getElementById('tgllahir').addEventListener('change', updatePassword);
+
+    function updatePassword() {
+      const nama = document.getElementById('nama').value;
+      const tgllahir = document.getElementById('tgllahir').value;
+      if (nama && tgllahir) {
+        const pwd = generatePassword(nama, tgllahir);
+        document.getElementById('password').value = pwd;
+      }
+    }
+
+    document.getElementById('checkerForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      const formData = new FormData(this);
+      const scriptURL = 'https://corsproxy.io/?https://script.google.com/macros/s/AKfycbzXK4HbdNLK_EFMOuI03Cx9387ll_0adoKqE5NwWLEDMlLLZ94-x_q9-gBl_XoC-J2I/exec';
+
+      fetch(scriptURL, {
+        method: 'POST',
+        body: formData
+      })
+      .then(response => response.json())
+      .then(result => {
+        document.getElementById('status').textContent = result.message;
+        document.getElementById('checkerForm').reset();
+      })
+      .catch(error => {
+        console.error('Error!', error.message);
+        document.getElementById('status').textContent = 'Gagal mengirim data.';
+      });
+    });
+  </script>
+</body>
+</html>
